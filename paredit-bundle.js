@@ -124,6 +124,9 @@
 })(function(exports) {
 
   exports.reader = {
+    setParentheses: function(parentheses) {
+      return setParentheses(parentheses);
+    },
 
     readSeq: function(src, xform) {
       return readSeq(null,src,Object.freeze([]),startPos(),xform).context;
@@ -138,11 +141,20 @@
   // read logic
 
   var eosexp = {}, eoinput = {}, // flags
-      close = {'[': ']', '(': ')', '{': '}'},
-      opening = Object.keys(close),
-      closing = opening.map(function(k) { return close[k]; }),
-      symRe = /[^\s\[\]\(\)\{\},"\\`@^#~]/,
+      close,
+      opening,
+      closing,
+      symRe,
       readerSpecials = /[`@^#~]/;
+
+  function setParentheses(parentheses) {
+    close = parentheses;  // e.g. {'[': ']', '(': ')', '{': '}'}
+    opening = Object.keys(close);
+    closing = opening.map(function(k) { return close[k]; });
+    symRe = new RegExp("[^\\s" + Object.entries(close).map(function (pair) { return "\\" + pair[0] + "\\" + pair[1] }).join("") + ",\"\\\\`@^#~]");  // e.g. /[^\s\[\]\(\)\{\},"\\`@^#~]/
+  }
+
+  setParentheses({'[': ']', '(': ')', '{': '}'}); // Default parentheses config
 
   function readSexp(contextStart, input, context, pos, xform) {
     var ch = input[0];

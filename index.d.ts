@@ -61,6 +61,7 @@ export namespace reader {
     type Xform<T> = (type: string, read: T[] | number | string | ReaderError<T>,
         start: Position, end: Position, args: { open: string, close: string }) => T
 
+    export function setParentheses(parentheses: { [open: string]: string }): void
     export function readSeq<T>(src: string, xform: Xform<T>): T[]
     export function readSexp<T>(src: string, xform: Xform<T>): T
 }
